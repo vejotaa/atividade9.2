@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const API_URL = 'http://localhost:3001/notas';
+const API_URL = 'https://atividade9-2.onrender.com/notas';
 
 function App() {
   const [notas, setNotas] = useState([]);
