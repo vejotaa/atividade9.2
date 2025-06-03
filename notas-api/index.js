@@ -11,6 +11,26 @@ app.use(cors());
 
 const FILE_PATH = './notas.json';
 
+// Função para garantir arquivo válido
+function inicializarArquivo() {
+  try {
+    if (!fs.existsSync(FILE_PATH)) {
+      fs.writeFileSync(FILE_PATH, '[]', 'utf8');
+    } else {
+      const data = fs.readFileSync(FILE_PATH, 'utf8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length === 1 && Object.keys(parsed[0]).length === 0) {
+        fs.writeFileSync(FILE_PATH, '[]', 'utf8');
+      }
+    }
+  } catch (err) {
+    fs.writeFileSync(FILE_PATH, '[]', 'utf8');
+  }
+}
+
+// Inicializa arquivo na inicialização do servidor
+inicializarArquivo();
+
 // Função para ler notas do arquivo
 function lerNotas() {
   try {
@@ -26,13 +46,13 @@ function salvarNotas(notas) {
   fs.writeFileSync(FILE_PATH, JSON.stringify(notas, null, 2));
 }
 
-// GET todas as notas
+// Rotas...
+
 app.get('/notas', (req, res) => {
   const notas = lerNotas();
   res.json(notas);
 });
 
-// GET nota por id
 app.get('/notas/:id', (req, res) => {
   const notas = lerNotas();
   const nota = notas.find(n => n.id === parseInt(req.params.id));
@@ -43,7 +63,6 @@ app.get('/notas/:id', (req, res) => {
   }
 });
 
-// POST criar nota
 app.post('/notas', (req, res) => {
   const notas = lerNotas();
   const novaNota = {
@@ -56,7 +75,6 @@ app.post('/notas', (req, res) => {
   res.status(201).json(novaNota);
 });
 
-// PUT atualizar nota
 app.put('/notas/:id', (req, res) => {
   const notas = lerNotas();
   const index = notas.findIndex(n => n.id === parseInt(req.params.id));
@@ -70,7 +88,6 @@ app.put('/notas/:id', (req, res) => {
   }
 });
 
-// DELETE nota
 app.delete('/notas/:id', (req, res) => {
   let notas = lerNotas();
   const originalLength = notas.length;
